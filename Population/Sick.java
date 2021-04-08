@@ -35,6 +35,9 @@ public class Sick extends Person {
     }
 
     @Override
+    public double contagionProbability() { return 0; }
+
+    @Override
     public Person contagion(IVirus virus) {
         throw new RuntimeException("A sick person cannot be infected.");
     }
