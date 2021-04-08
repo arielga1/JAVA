@@ -3,7 +3,7 @@ package Virus;
 import Population.Person;
 
 /**
- * The Varus TM
+ * TheVarus TM
  *
  * https://www.youtube.com/watch?v=2rRIqrWuYy4
  *
