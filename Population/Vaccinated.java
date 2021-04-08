@@ -1,5 +1,7 @@
 package Population;
 
+import Location.Point;
+
 public class Vaccinated extends Person {
     private long vaccinationTime;
     private static long limit = 21;
@@ -13,6 +15,9 @@ public class Vaccinated extends Person {
         this.vaccinationTime = 0;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double contagionProbability() {
         if (this.vaccinationTime < limit) {
@@ -22,5 +27,10 @@ public class Vaccinated extends Person {
             // max(0.05, 1.05/(t-14))        :  t>=21
             return Math.max(0.05, 1.05/(this.vaccinationTime - 14));
         }
+    }
+
+    public static void main(String [] args) {
+        Vaccinated p = (Vaccinated) (new Healthy(1, new Point(), null)).vaccinate();
+        double d = p.contagionProbability();
     }
 }

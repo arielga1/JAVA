@@ -15,6 +15,9 @@ public class Convalescent extends Person{
         this.virus = virus;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double contagionProbability() { return 0.2; }
 }

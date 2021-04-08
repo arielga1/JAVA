@@ -29,14 +29,23 @@ public class Sick extends Person {
      */
     public boolean tryToDie() { return this.virus.tryToKill(this); }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean getHealthStatus() {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double contagionProbability() { return 0; }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Person contagion(IVirus virus) {
         throw new RuntimeException("A sick person cannot be infected.");
