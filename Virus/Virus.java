@@ -46,11 +46,11 @@ public abstract class Virus implements IVirus {
     public double contagionProbability(Person person) {
         int age = person.getAge();
         if (age <= this.age1)
-            return this.cProbability1;
+            return this.cProbability1 * person.contagionProbability();
         else if (age <= this.age2)
-            return this.cProbability2;
+            return this.cProbability2 * person.contagionProbability();
         else
-            return this.cProbability3;
+            return this.cProbability3 * person.contagionProbability();
     }
 
     /**
@@ -66,21 +66,28 @@ public abstract class Virus implements IVirus {
         if (!(person1.getSettlement().equals(person2.getSettlement())))
             throw new RuntimeException("The two people must be in the same settlement.");
         if (!person2.getHealthStatus()) {
-            int age = person2.getAge();
             // get the base probability
-            double probability;
-            if (age <= this.age1)
-                probability = this.cProbability1;
-            else if (age <= this.age2)
-                probability = this.cProbability2;
-            else
-                probability = this.cProbability3;
+            double probability = contagionProbability(person2);
             // calculate if it hit
             Random rnd = new Random();
             double chance = rnd.nextDouble();
             return chance <= probability;
         }
         return false;
+    }
+
+    /**
+     * Checks the base death probability for the given age.
+     * @param age           The age.
+     * @return              The base probability of dying.
+     */
+    private double getDieProbability(int age) {
+        if (age <= this.age1)
+            return this.dieProbability1;
+        else if (age <= this.age2)
+            return this.dieProbability2;
+        else
+            return this.dieProbability3;
     }
 
     /**
@@ -91,18 +98,11 @@ public abstract class Virus implements IVirus {
      */
     @Override
     public boolean tryToKill(Person person) {
-        // sanity check and age
+        // sanity check
         if (person.getHealthStatus())
             return false;
-        int age = person.getAge();
         // get the base chance of dying to this virus
-        double probability;
-        if (age <= this.age1)
-            probability = this.dieProbability1;
-        else if (age <= this.age2)
-            probability = this.dieProbability2;
-        else
-            probability = this.dieProbability3;
+        double probability = getDieProbability(person.getAge());
         // calculate the actual chance of the person dying.
         long time = ((Sick)person).getContagionTime();
         double actualProbability;
