@@ -36,6 +36,26 @@ public abstract class Virus implements IVirus {
         this.dieProbability2 = dp2;
         this.dieProbability3 = dp3;
     }
+
+    /**
+     * A constructor. Individual variants will set probabilities and age groups
+     * to suit their internal logic.
+     * @param age           The separator between the two groups.
+     * @param cp1           The contagion probability of group 1.
+     * @param cp2           The contagion probability of group 2.
+     * @param dp1           The death probability of group 1.
+     * @param dp2           The death probability of group 2.
+     */
+    public Virus(int age, double cp1, double cp2, double dp1, double dp2) {
+        this.age1 = age;
+        this.age2 = age;
+        this.cProbability1 = cp1;
+        this.cProbability2 = cp2;
+        this.cProbability3 = cp2;
+        this.dieProbability1 = dp1;
+        this.dieProbability2 = dp2;
+        this.dieProbability3 = dp2;
+    }
     /**
      * Checks the likelihood of infecting the given person.
      *
@@ -68,6 +88,10 @@ public abstract class Virus implements IVirus {
         if (!person2.getHealthStatus()) {
             // get the base probability
             double probability = contagionProbability(person2);
+            // apply formula
+            probability = probability * Math.min(
+                    1, 0.14 * Math.exp(2 - 0.25 * person1.distance(person2))
+            );
             // calculate if it hit
             Random rnd = new Random();
             double chance = rnd.nextDouble();
