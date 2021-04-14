@@ -23,20 +23,31 @@ public class Point {
          */
     }
 
-    public Point() {
+    /**
+     * Calculates the distance between this point and another.
+     * @param other             The other point.
+     * @return                  The distance from it.
+     */
+    public double distance(Point other) {
+        return Math.sqrt(
+                Math.pow((this.x - other.x), 2) +
+                Math.pow((this.y - other.y), 2)
+        );
     }
-    public int getX() { return this.x; }
+
     /**
      *
      * @return this.x
      */
-    public int getY() {
-        return this.y;
-    }
+    public int getX() { return this.x; }
+
     /**
      *
      * @return this.y
      */
+    public int getY() {
+        return this.y;
+    }
 
     @Override
     public String toString() {
@@ -49,6 +60,13 @@ public class Point {
 
     public boolean equals(Point point) {
        return (this.getY()==point.getY() && this.getX()==point.getX());
+    }
+
+
+    public static void main(String [] args) {
+        Point p1 = new Point(1,1);
+        Point p2 = new Point(4, 5);
+        System.out.println(p1.distance(p2));
     }
 
 }
