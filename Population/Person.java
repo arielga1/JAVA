@@ -75,4 +75,13 @@ public abstract class Person {
      * @return              true if healthy, false if ill.
      */
     public boolean getHealthStatus() { return true; }
+
+    /**
+     * Calculates the distance between two people.
+     * @param other             The other person.
+     * @return                  The distance between the two.
+     */
+    public double distance(Person other) {
+        return this.location.distance(other.location);
+    }
 }
