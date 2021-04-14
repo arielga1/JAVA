@@ -1,3 +1,7 @@
+/*
+Nikolay Babkin  321123242
+Ariel Genezya   313532798
+ */
 package Virus;
 
 import java.util.Random;

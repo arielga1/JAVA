@@ -1,6 +1,8 @@
+/*
+Nikolay Babkin  321123242
+Ariel Genezya   313532798
+ */
 package Virus;
-import Virus.IVirus;
-import java.util.Random;
 
 public class BritishVariant extends Virus {
     /**
