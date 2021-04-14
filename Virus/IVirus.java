@@ -1,6 +1,7 @@
 package Virus;
 
 import Population.Person;
+import Population.Sick;
 
 /**
  * TheVarus TM
@@ -30,5 +31,5 @@ public interface IVirus {
      * @param person        The person.
      * @return              The result.
      */
-    boolean tryToKill(Person person);
+    boolean tryToKill(Sick person);
 }

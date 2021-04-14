@@ -45,10 +45,11 @@ public class Sick extends Person {
 
     /**
      * {@inheritDoc}
+     * Returns a null, since he is already sick with a virus.
      */
     @Override
-    public Person contagion(IVirus virus) {
-        throw new RuntimeException("A sick person cannot be infected.");
+    public Sick contagion(IVirus virus) {
+        return null;
     }
 
     /**
@@ -56,4 +57,39 @@ public class Sick extends Person {
      * @return              The time the person had the virus.
      */
     public long getContagionTime() { return this.contagionTime; }
+
+    /**
+     * Makes the sick person come in contact with someone else.
+     * @param other         The other person.
+     * @return              Whether or not the other person got infected.
+     */
+    public boolean touch(Person other) {
+        boolean res = this.virus.tryToContagion(this, other);
+        if (res)
+            other.contagion(this.virus);
+        return res;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Sick))
+            return false;
+        return super.equals(other) &&
+                (this.contagionTime == ((Sick) other).contagionTime) &&
+                this.virus.equals(((Sick) other).virus);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "Sick Person\n" +
+                this.virus + "\n" +
+                "Sick for: " + this.contagionTime + "\n" +
+                super.toString();
+    }
 }

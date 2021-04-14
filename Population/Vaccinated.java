@@ -29,8 +29,29 @@ public class Vaccinated extends Person {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Vaccinated))
+            return false;
+        return super.equals(other) &&
+                (this.vaccinationTime == ((Vaccinated) other).vaccinationTime);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "Vaccinated Person\n" +
+                "Vaccinated for: " + this.vaccinationTime + "\n" +
+                super.toString();
+    }
+
     public static void main(String [] args) {
-        Vaccinated p = (Vaccinated) (new Healthy(1, new Point(), null)).vaccinate();
+        Vaccinated p = (Vaccinated) (new Healthy(1, new Point(0, 0), null)).vaccinate();
         double d = p.contagionProbability();
     }
 }

@@ -121,14 +121,11 @@ public abstract class Virus implements IVirus {
      * @return The result.
      */
     @Override
-    public boolean tryToKill(Person person) {
-        // sanity check
-        if (person.getHealthStatus())
-            return false;
+    public boolean tryToKill(Sick person) {
         // get the base chance of dying to this virus
         double probability = getDieProbability(person.getAge());
         // calculate the actual chance of the person dying.
-        long time = ((Sick)person).getContagionTime();
+        long time = person.getContagionTime();
         double actualProbability;
         double poi = probability - 0.01*probability*(time - 15)*(time - 15);
         actualProbability = Math.max(0, poi);
@@ -141,7 +138,7 @@ public abstract class Virus implements IVirus {
     public static void main(String [] args) {
         Person p = new Healthy(20, new Point(2, 4), null);
         IVirus v = new ChineseVariant();
-        p = p.contagion(v);
-        System.out.println(v.tryToKill(p));
+        Sick ps = p.contagion(v);
+        System.out.println(v.tryToKill(ps));
     }
 }

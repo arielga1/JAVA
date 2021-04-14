@@ -20,6 +20,22 @@ public enum RamzorColor {
      */
     public double coefficient() { return this.value; }
 
+    /**
+     * Assigns a ramzor grade to a given value.
+     * @param value         The value.
+     * @return              The grade for the value.
+     */
+    public static RamzorColor getGrade(double value) {
+        if (value <= Green.value)
+            return Green;
+        else if (value <= Yellow.value)
+            return Yellow;
+        else if (value <= Orange.value)
+            return Orange;
+        else
+            return Red;
+    }
+
     public static void main(String [] args) {
         System.out.println(RamzorColor.Green.coefficient());
     }

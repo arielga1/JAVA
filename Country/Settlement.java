@@ -2,9 +2,12 @@ package Country;
 
 import Location.*;
 import Population.Person;
+import Population.Sick;
+import Virus.IVirus;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 /**
  *
@@ -14,100 +17,198 @@ public abstract class Settlement {
     private Location location;
     private List<Person> people;
     private RamzorColor ramzorColor;
+    private int capacity;
 
     /**
      * The constructor.
      * @param name          The name of the settlement.
      * @param location      The location of the settlement.
      * @param people        The people living in the settlement.
+	 * @param capacity		The capacity of the city for people.
      */
     public Settlement(String name, Location location,
-                      List<Person> people, RamzorColor ramzorColor) {
-                        this.name = name;
-                        this.location = location;
-                        if (people == null) {
-                            this.people = new ArrayList<>();
-                        }
-                        this.people = people;
-                        this.ramzorColor = RamzorColor.Green;
+                      List<Person> people, int capacity) {
+    	this.name = name;
+    	this.location = location;
+		this.capacity = capacity;
+		if (people == null) {
+    		this.people = new ArrayList<>();
+    	}
+    	else
+    		this.people = people;
+    	this.ramzorColor = RamzorColor.Green;
     }
 
-    /**
-     * Calculates the ramzor grade of the city.
-     * @return              The grade.
-     */
-	public String get_Name() {
-		return name;
+	/**
+	 * Calculates the ramzor grade of the settlement.
+	 * @return			The ramzor grade.
+	 */
+	public RamzorColor calculateRamzorGrade() {
+		double c = this.getRamzorCoefficient(this.ramzorColor);
+		return RamzorColor.getGrade(c);
 	}
-	public Location get_Location() {
-		return location;
-	}
-	
-	public List<Person> get_People() {
-		return people;
-	}
-	public RamzorColor get_RamzorColor() {
-		return ramzorColor;
-	}
-	
-	public void set_People(List<Person> p) {
-		this.people.clear();
-		for(int i=0;i<p.size();++i)
-			this.people.add(i, p.get(i));
-	}
-	public void set_Name(String name) {
-		this.name = name;
-	}
-	
-	public void set_Location(Location location) {
-		this.location = location;
-	}
-	
-	public void set_RamzorColor(RamzorColor ramzorColor) {
-		this.ramzorColor = ramzorColor;
-	}
-	
-	public abstract RamzorColor calculateRamzorGrade();
-	
-	
-	public double contagiousPercent() { 
-		int count=0;
-		for (int i=0;i<people.size();++i)
-		{
-			if (people.get(i) instanceof Sick)
-				++count;
+
+	/**
+	 * Calculates the ramzor coefficient for the type of settlement.
+	 * @return				The coefficient.
+	 */
+	protected abstract double getRamzorCoefficient(RamzorColor c);
+
+	/**
+	 * Checks what percentage of the population is sick.
+	 * @return			The percentage of ill people in [0, 1].
+	 */
+	public double contagiousPercent() {
+		int total = this.people.size();
+		int count = 0;
+		for (int i = 0 ; i < total ; i++) {
+			if (!(this.people.get(i).getHealthStatus()))
+				count++;
 		}
-		return count/people.size();
+		return count / total;
 	}
-	
-	public Point randomLocation()
-	{
-		return new Point((int)Math.random(),(int)Math.random());
+
+	/**
+	 * Generates a random point in the settlement.
+	 * @return				The point.
+	 */
+	public Point randomLocation() {
+		return this.location.randomPoint();
 	}
-	
-    public abstract RamzorColor calculateRamzorGrade();
-    @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof Settlement))
-            return false;
-        Settlement set = (Settlement)other;
-        return this.name.equals(set.name) &&
-                this.location.equals(set.location) &&
-                this.people.equals(set.people) &&
-                this.ramzorColor.equals(set.ramzorColor);
-    }
-    
-	public boolean transferPerson(Person person, Settlement settlement) {
-		return true;
-	}
-	
+
+	/**
+	 * Attempts to add a person to the settlement.
+	 * @param p			The person.
+	 * @return			True if added, false otherwise.
+	 */
 	public boolean addPerson(Person p) {
-		Person [] new_people= new Person[people.length+1];
-		for(int i=0;i<new_people.length;i++)
-		{
-			new_people[i]=this.people[i];
-		}
-		new_people[new_people.length-1]=p;
+		if (this.people.contains(p))
+			return false;
+		this.people.add(p);
+		p.setSettlement(this);
 		return true;
 	}
+
+	/**
+	 * Removes a person from the settlement.
+	 * @param p			The person.
+	 * @return			The result.
+	 */
+	public boolean removePerson(Person p) {
+		if (!this.people.contains(p))
+			return false;
+		this.people.remove(p);
+		p.setSettlement(null);
+		return true;
+	}
+
+	/**
+	 * Attempts to transfer a given person from this settlement to another.
+	 * @param p				The person.
+	 * @param other			The other settlment.
+	 * @return				The success of the transfer.
+	 */
+	public boolean transferPerson(Person p, Settlement other) {
+		// Won't bother to transfer a person to the same settlement
+		if (this.equals(other))
+			return false;
+		// Won't attempt to transfer someone who is not in the settlement.
+		if (!this.people.contains(p))
+			return false;
+		// try to add the person to the other settlement
+		boolean success = other.addPerson(p);
+		// if succeded, remove from this and report true
+		if (success) {
+			this.people.remove(p);
+			return true;
+		}
+		// if failed, report failure
+		return false;
+	}
+
+	/**
+	 * Attempts to infect a given person with a given virus.
+	 * @param p				The person.
+	 * @param v				The virus.
+	 * @return				The result.
+	 */
+	public boolean infectPerson(Person p, IVirus v) {
+		if (!this.people.contains(p))
+			return false;
+		Sick sicko = p.contagion(v);
+		if (null == sicko)
+			return false;
+		this.people.remove(p);
+		this.people.add(sicko);
+		return true;
+	}
+
+	/**
+	 * Getter for people.
+	 * @return			The list of people.
+	 */
+	public List<Person> getPeople() { return this.people; }
+
+	/**
+	 * Checks how many people live in the settlement.
+	 * @return			The number of people.
+	 */
+	public int numPeople() { return this.people.size(); }
+
+	/**
+	 * Grabs a random sucker from the crowd.
+	 * @return			The rando.
+	 */
+	public Person getRandomPerson() {
+		Random rnd = new Random();
+		return this.people.get(rnd.nextInt(this.numPeople()));
+	}
+
+	/**
+	 * Grabs a random victim from the crowd.
+	 * @return			The victim.
+	 */
+	public Sick getSickPerson() {
+		for (int i = 0 ; i < this.numPeople() ; ++i)
+			if (!this.people.get(i).getHealthStatus())
+				return (Sick)this.people.get(i);
+		return null;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof Settlement))
+			return false;
+		Settlement set = (Settlement)other;
+		return this.name.equals(set.name) &&
+				this.people.equals(set.people) &&
+				this.location.equals(set.location) &&
+				this.ramzorColor.equals(set.ramzorColor);
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public String toString() {
+		return "Name: " + this.name + "\n" +
+				this.location + "\n" +
+				"Ramzor Code: " + this.ramzorColor + "\n" +
+				"Population: \n" + this.people;
+	}
+
+	/**
+	 * Getter for capacity.
+	 * @return			The settlement's capacity.
+	 */
+	public int getCapacity() { return this.capacity; }
+
+	/**
+	 * Getter for name.
+	 * @return			The name.
+	 */
+	public String getName() { return this.name; }
 }

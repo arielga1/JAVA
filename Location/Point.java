@@ -51,15 +51,22 @@ public class Point {
 
     @Override
     public String toString() {
-        return "Point [x=" + x + ", y=" + y + "]";
+        return "Point (" + this.x + ", " + this.y + ")";
     }
     /**
             *
             * @return the current point
 	 */
 
-    public boolean equals(Point point) {
-       return (this.getY()==point.getY() && this.getX()==point.getX());
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Point))
+            return false;
+        Point p = (Point) other;
+        return (this.x == p.x) && (this.y == p.y);
     }
 
 

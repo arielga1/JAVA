@@ -22,4 +22,23 @@ public class Healthy extends Person {
     public Person vaccinate() {
         return new Vaccinated(this);
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Healthy))
+            return false;
+        return super.equals(other);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return "Healthy Person\n" +
+                super.toString();
+    }
 }

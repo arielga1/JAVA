@@ -50,13 +50,16 @@ public class Size {
      * @return the size
      */
 
-    public boolean equals(Size size) {
-        return (this.getWidth()==size.getWidth() && this.getHeight()==size.getHeight());
-        /**
-         * Checks if two sizes are the same
-         */
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Size))
+            return false;
+        Size s = (Size)other;
+        return (this.height == s.height) &&
+                (this.width == s.width);
     }
-
-
 }
 

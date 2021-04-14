@@ -47,9 +47,11 @@ public abstract class Person {
      * @param virus         The virus.
      * @return              The person as a sick person.
      */
-    public Person contagion(IVirus virus) {
-
-        return new Sick(this, virus);
+    public Sick contagion(IVirus virus) {
+        Sick sickMe = new Sick(this, virus);
+        this.settlement.addPerson(sickMe);
+        this.settlement.removePerson(this);
+        return sickMe;
     }
 
     /**
@@ -71,6 +73,13 @@ public abstract class Person {
     public Settlement getSettlement() { return this.settlement; }
 
     /**
+     * Setter for settlement.
+     * @param set           The settlement to change to.
+     * @return              True.
+     */
+    public boolean setSettlement(Settlement set) { this.settlement = set; return true; }
+
+    /**
      * Checks the health status of the person.
      * @return              true if healthy, false if ill.
      */
@@ -83,5 +92,27 @@ public abstract class Person {
      */
     public double distance(Person other) {
         return this.location.distance(other.location);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean equals(Object other) {
+        if (!(other instanceof Person)) {
+            return false;
+        }
+        Person p = (Person) other;
+        return this.location.equals(p.location) &&
+                (this.age == p.age) &&
+                this.settlement == p.settlement;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String toString() {
+        return this.age + "; " + this.location + "; " + this.settlement.getName() + "\n";
     }
 }
