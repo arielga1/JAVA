@@ -3,15 +3,14 @@ Nikolay Babkin  321123242
 Ariel Genezya   313532798
  */
 package Country;
-
 import Location.*;
 import Population.Person;
 import Population.Sick;
 import Virus.IVirus;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+
 
 /**
  *
@@ -22,6 +21,11 @@ public abstract class Settlement {
     private List<Person> people;
     private RamzorColor ramzorColor;
     private int capacity;
+    private int MAX_PEOPLE;
+    private List<Sick> Sickpeople;
+    private List<Person> Healthypeople;
+    private int Vaccines;
+    private List<Settlement> connectedSettlements = new ArrayList<>();
 
     /**
      * The constructor.
@@ -31,7 +35,8 @@ public abstract class Settlement {
 	 * @param capacity		The capacity of the city for people.
      */
     public Settlement(String name, Location location,
-                      List<Person> people, int capacity) {
+                      List<Person> people, int capacity,
+                      List<Sick> Sickpeople, List<Person> Healthypeople) {
     	this.name = name;
     	this.location = location;
 		this.capacity = capacity;
@@ -41,6 +46,19 @@ public abstract class Settlement {
     	else
     		this.people = people;
     	this.ramzorColor = RamzorColor.Green;
+    	this.MAX_PEOPLE = s.MAX_PEOPLE;
+    	if (Sickpeople == null) {
+    		this.Sickpeople = new ArrayList<>();
+    	}
+    	else
+    		this.Sickpeople = Sickpeople;
+    	if (Healthypeople == null) {
+    		this.Healthypeople = new ArrayList<>();
+    	}
+    	else
+    		this.Healthypeople = Healthypeople;
+        this.Vaccines = Vaccines;
+        this.connectedSettlements = connectedSettlements;
     }
 
 	/**
@@ -85,14 +103,19 @@ public abstract class Settlement {
 	 * @param p			The person.
 	 * @return			True if added, false otherwise.
 	 */
-	public boolean addPerson(Person p) {
-		if (this.people.contains(p))
-			return false;
-		this.people.add(p);
-		p.setSettlement(this);
-		return true;
-	}
-
+	
+    public boolean addPerson(Person p) {
+        if (this.getPopulationSize() < MAX_PEOPLE) {
+            if (p instanceof Sick) {
+                sickPeople.add((Sick) p);
+            } else {
+                healthyPeople.add(p);
+            }
+            return true;
+        }
+        return false;
+    }
+    
 	/**
 	 * Removes a person from the settlement.
 	 * @param p			The person.
@@ -113,6 +136,9 @@ public abstract class Settlement {
 	 * @return				The success of the transfer.
 	 */
 	public boolean transferPerson(Person p, Settlement other) {
+        double virusT = Settlement.ramzorColor()*
+                this.ramzorColor.
+		double randomD = random.nextDouble();
 		// Won't bother to transfer a person to the same settlement
 		if (this.equals(other))
 			return false;
@@ -122,7 +148,14 @@ public abstract class Settlement {
 		// try to add the person to the other settlement
 		boolean success = other.addPerson(p);
 		// if succeded, remove from this and report true
-		if (success) {
+		if (success)
+		{
+            if (virusT < randomDouble) {
+                if (!(p instanceof Sick)) {
+                    healthyPeople.remove(p);
+                } else {
+                    sickPeople.remove(p);
+                }
 			this.people.remove(p);
 			return true;
 		}
@@ -167,6 +200,11 @@ public abstract class Settlement {
 		Random rnd = new Random();
 		return this.people.get(rnd.nextInt(this.numPeople()));
 	}
+    /**
+	 * Getter for vaccines.
+    * @return       Vaccine doses
+    */
+   public int getVaccines(){return this.vaccines;}
 
 	/**
 	 * Grabs a random victim from the crowd.
@@ -179,6 +217,12 @@ public abstract class Settlement {
 		return null;
 	}
 
+    /**
+    *
+    * @return         new ramzor color
+    */
+   public abstract RamzorColor calculateRamzorGrade();
+   
 	/**
 	 * {@inheritDoc}
 	 */
