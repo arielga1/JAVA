@@ -29,7 +29,7 @@ public class Clock {
 
 /**
  * calculates  how many days have passed since starting time.
- * @param start    starting time.
+ * @param          starting time.
  * @return         how many days have passed.
  */
 public static long timepass(long start){
